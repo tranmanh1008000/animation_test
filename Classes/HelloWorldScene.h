@@ -38,8 +38,10 @@ public:
 	cocos2d::Animation *createAnimation(std::string prefixName, int spriteNumber, float delay);
 	cocos2d::Animation *animation;
 
-	bool onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *event); 
+	bool onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *event);
+	void onTouchEnded(cocos2d::Touch * touch, cocos2d::Event * event);
 
+	bool isjump;
 	cocos2d::Sprite *Idle1;
 
 	void Idle();

@@ -94,8 +94,9 @@ bool HelloWorld::init()
 
 	auto touchListener = EventListenerTouchOneByOne::create();
 	touchListener->onTouchBegan = CC_CALLBACK_2(HelloWorld::onTouchBegan, this);
-	_eventDispatcher->addEventListenerWithSceneGraphPriority(touchListener, this);
+	touchListener->onTouchEnded = CC_CALLBACK_2(HelloWorld::onTouchEnded, this);
 
+	_eventDispatcher->addEventListenerWithSceneGraphPriority(touchListener, this);
     return true;
 }
 
@@ -129,17 +130,29 @@ cocos2d::Animation *HelloWorld::createAnimation(std::string prefixName, int spri
 
 bool HelloWorld::onTouchBegan(cocos2d::Touch * touch, cocos2d::Event * event)
 {
-	animation->release();
-	animation = HelloWorld::createAnimation("Jump", 15, 0.05f);
-	auto animate = Animate::create(animation);
-	animate->retain();
-	auto seq = Sequence::create(animate, CallFuncN::create(CC_CALLBACK_0(HelloWorld::Idle, this)), NULL);
-	Idle1->runAction(seq);
+	if (!isjump)
+	{
+		animation->release();
+		animation = HelloWorld::createAnimation("Jump", 15, 0.1f);
+		auto jumpup = JumpBy::create(0.35, cocos2d::Vec2(0, 100), 0, 0);
+		auto falldown = JumpBy::create(0.5, Vec2(0, -100), 0, 0);
+		auto animate = Animate::create(animation);
+		animate->retain();
+		auto spawn = Spawn::createWithTwoActions(jumpup, animate);
+		auto seq = Sequence::create(spawn, falldown, CallFuncN::create(CC_CALLBACK_0(HelloWorld::Idle, this)), NULL);
+		Idle1->runAction(seq);
+	}
+	isjump = true;
 	return true;
 }
 
+void HelloWorld::onTouchEnded(cocos2d::Touch * touch, cocos2d::Event * event)
+{
+	isjump = false;
+}
 
 
+bool isjump = false;
 
 
 void HelloWorld::menuCloseCallback(Ref* pSender)
